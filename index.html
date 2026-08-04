@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>The Gallery — Architectural Design</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
@@ -418,6 +418,9 @@
       pointer-events: none;
       transition: opacity 0.6s var(--ease-expo);
       padding: 4vh 4vw;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
     }
 
     .modal.active {
@@ -550,14 +553,252 @@
       letter-spacing: 0.05em;
     }
 
+    /* =========================================================
+   MOBILE OPTIMIZATIONS
+   ========================================================= */
     @media (max-width: 768px) {
+
+      /* Typography scale down */
+      .hero-title {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+        line-height: 1.0;
+      }
+
+      .hero-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 2rem;
+      }
+
+      .hero {
+        padding: 6vw;
+        padding-bottom: 8vh;
+      }
+
+      /* About section */
+      .about {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 12vh 6vw;
+      }
+
+      .about-label {
+        position: static;
+        margin-bottom: 1rem;
+      }
+
+      .about-text {
+        font-size: clamp(1.25rem, 5vw, 1.75rem);
+      }
+
+      /* Navigation — Hamburger */
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        background: var(--fg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        transform: translateX(100%);
+        transition: transform 0.5s var(--ease-expo);
+        mix-blend-mode: normal;
+        z-index: 99;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+        /* override previous display:none */
+      }
+
+      .nav-links.open {
+        transform: translateX(0);
+      }
+
+      .nav-links a {
+        font-size: 1.5rem;
+        color: #fff;
+      }
+
+      .menu-toggle {
+        display: block;
+        position: relative;
+        z-index: 101;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        mix-blend-mode: difference;
+      }
+
+      .menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 1.5px;
+        background: #fff;
+        margin: 6px 0;
+        transition: 0.3s;
+      }
+
+      .menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+      }
+
+      /* Projects */
+      .projects-section {
+        padding: 8vh 6vw 12vh;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 3rem;
+      }
+
+      .project-card:nth-child(n) {
+        grid-column: 1 / -1;
+        margin-top: 0;
+      }
+
+      .projects-grid {
+        gap: 3rem;
+      }
+
+      .project-image-wrap {
+        aspect-ratio: 3 / 4;
+        /* taller on mobile */
+      }
+
+      /* Modal */
+      .modal {
+        padding: 0;
+      }
+
       .modal-content {
         grid-template-columns: 1fr;
         gap: 2rem;
+        margin: 0;
+        padding: 6vh 6vw;
+        max-height: none;
+      }
+
+      .modal-images {
+        order: -1;
+        /* images first on mobile */
+      }
+
+      .modal-hero {
+        max-height: 35vh;
       }
 
       .modal-collage {
-        column-count: 1;
+        column-count: 2;
+        column-gap: 0.5rem;
+      }
+
+      .modal-collage img {
+        margin-bottom: 0.5rem;
+      }
+
+      .modal-close {
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+        z-index: 10;
+      }
+
+      .modal-title {
+        font-size: 1.75rem;
+      }
+
+      .modal-details {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+        padding: 1.5rem 0;
+      }
+
+      /* Lightbox */
+      .lightbox {
+        padding: 4vw;
+      }
+
+      .lightbox img {
+        max-height: 70vh;
+      }
+
+      .lightbox-close {
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+      }
+
+      /* Contact */
+      .contact-section {
+        padding: 10vh 6vw;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .contact-alt {
+        padding-top: 0;
+      }
+
+      .contact-form .form-group {
+        margin-bottom: 1.75rem;
+      }
+
+      /* Footer */
+      footer {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding: 10vh 6vw 6vh;
+      }
+
+      .footer-brand {
+        font-size: 1.5rem;
+      }
+
+      /* Utilities */
+      body {
+        cursor: auto;
+      }
+
+      .cursor {
+        display: none !important;
+      }
+
+      /* Preloader */
+      .preloader-text {
+        font-size: clamp(1.5rem, 8vw, 2.5rem);
+      }
+    }
+
+    /* Hide hamburger on desktop */
+    .menu-toggle {
+      display: none;
+    }
+
+    @media (max-width: 768px) {
+      .menu-toggle {
+        display: block;
       }
     }
 
@@ -889,8 +1130,13 @@
 
   <!-- Navigation -->
   <nav id="navbar">
-    <a href="#" class="logo">The Gallery</a>
-    <ul class="nav-links">
+    <a href="#" class="logo">THE GALLERY</a>
+    <button class="menu-toggle" id="menu-toggle" aria-label="Menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
       <li><a href="#about">About</a></li>
       <li><a href="#projects">Projects</a></li>
       <li><a href="#contact">Contact</a></li>
@@ -919,7 +1165,8 @@
   <section class="about" id="about">
     <div class="about-label">Philosophy</div>
     <div class="about-text" id="about-text">
-      My vision goes beyond creating aesthetically pleasing livable spaces, by creating an experience for the users to always look back to. I realized that, as architects, we create lifestyles, habits, and memories.
+      My vision goes beyond creating aesthetically pleasing livable spaces, by creating an experience for the users to
+      always look back to. I realized that, as architects, we create lifestyles, habits, and memories.
     </div>
   </section>
 
@@ -1510,6 +1757,38 @@
       });
     }
 
+    // ============================
+    // MOBILE MENU
+    // ============================
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', () => {
+        menuToggle.classList.toggle('active');
+        navLinks.classList.toggle('open');
+      });
+
+      // Close menu when a link is clicked
+      navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+          menuToggle.classList.remove('active');
+          navLinks.classList.remove('open');
+        });
+      });
+    }
+
+    // ============================
+    // TOUCH DEVICE DETECTION
+    // ============================
+    const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
+
+    if (isTouchDevice) {
+      // Remove hover-dependent cursor states
+      document.querySelectorAll('.project-card').forEach(card => {
+        card.style.cursor = 'pointer';
+      });
+    }
   </script>
 </body>
 
