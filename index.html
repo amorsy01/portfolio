@@ -25,6 +25,11 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      img,
+      video {
+        max-width: 100%;
+        height: auto;
+      }
     }
 
     html.lenis,
@@ -924,17 +929,25 @@
         margin-bottom: 3rem;
       }
 
-      .project-card:nth-child(n) {
-        grid-column: 1 / -1;
-        margin-top: 0;
+      .projects-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        width: 100%;
       }
 
-      .projects-grid {
-        gap: 3rem;
+      .project-card {
+        grid-column: auto !important;
+        margin-top: 0 !important;
+        width: 100%;
       }
 
       .project-image-wrap {
         aspect-ratio: 4 / 3;
+        width: 100%;
+      }
+
+      .project-image-wrap img {
+        transform: none;
       }
 
       /* MODAL — critical scroll fix */
@@ -1309,7 +1322,7 @@
     requestAnimationFrame(raf);
 
     lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+    gsap.ticker.add((time) => {lenis.raf(time * 1000);});
     gsap.ticker.lagSmoothing(0);
 
     const cursor = document.getElementById('cursor');
@@ -1400,16 +1413,16 @@
       });
 
       gsap.fromTo('.hero-title .line span',
-        { yPercent: 100, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.2 }
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.2}
       );
       gsap.fromTo('.hero-label span',
-        { yPercent: 100, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 1, ease: "power4.out" }
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1, ease: "power4.out"}
       );
       gsap.fromTo('.hero-meta span',
-        { yPercent: 100, autoAlpha: 0 },
-        { yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.6 }
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.6}
       );
 
       const aboutText = document.getElementById('about-text');
@@ -1441,9 +1454,9 @@
           }
         });
 
-        tl.to(mask, { scaleX: 0, duration: 1.2, ease: "power4.inOut" })
-          .to(img, { scale: 1, duration: 1.4, ease: "power3.out" }, "-=0.8")
-          .from(info.children, { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.6");
+        tl.to(mask, {scaleX: 0, duration: 1.2, ease: "power4.inOut"})
+          .to(img, {scale: 1, duration: 1.4, ease: "power3.out"}, "-=0.8")
+          .from(info.children, {y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out"}, "-=0.6");
       });
 
       gsap.from('.section-header', {
@@ -1451,7 +1464,7 @@
         opacity: 0,
         duration: 1,
         ease: "power3.out",
-        scrollTrigger: { trigger: '.section-header', start: 'top 85%' }
+        scrollTrigger: {trigger: '.section-header', start: 'top 85%'}
       });
 
       gsap.from('.contact-grid > *', {
@@ -1460,7 +1473,7 @@
         duration: 1,
         stagger: 0.2,
         ease: "power3.out",
-        scrollTrigger: { trigger: '.contact-section', start: 'top 75%' }
+        scrollTrigger: {trigger: '.contact-section', start: 'top 75%'}
       });
 
       gsap.from('footer > *', {
@@ -1469,14 +1482,14 @@
         duration: 1,
         stagger: 0.15,
         ease: "power3.out",
-        scrollTrigger: { trigger: 'footer', start: 'top 85%' }
+        scrollTrigger: {trigger: 'footer', start: 'top 85%'}
       });
     }
 
     let lastScroll = 0;
     const navbar = document.getElementById('navbar');
 
-    lenis.on('scroll', ({ scroll }) => {
+    lenis.on('scroll', ({scroll}) => {
       if (scroll > lastScroll && scroll > 100) navbar.classList.add('hidden');
       else navbar.classList.remove('hidden');
       lastScroll = scroll;
@@ -1533,7 +1546,7 @@
       // On mobile, .modal scrolls and needs the wheel event to bubble to it
       if (window.innerWidth > 768) {
         modalWheelHandler = (e) => e.stopPropagation();
-        modalContent.addEventListener('wheel', modalWheelHandler, { passive: true });
+        modalContent.addEventListener('wheel', modalWheelHandler, {passive: true});
       }
 
       gsap.from('.modal-hero', {
@@ -1554,13 +1567,13 @@
       document.body.style.overflow = '';
       lenis.start();
       if (modalWheelHandler) {
-        modalContent.removeEventListener('wheel', modalWheelHandler, { passive: true });
+        modalContent.removeEventListener('wheel', modalWheelHandler, {passive: true});
         modalWheelHandler = null;
       }
     }
 
     modalClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+    modal.addEventListener('click', (e) => {if (e.target === modal) closeModal();});
 
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
@@ -1641,7 +1654,7 @@
           const res = await fetch(contactForm.action, {
             method: 'POST',
             body: new FormData(contactForm),
-            headers: { Accept: 'application/json' }
+            headers: {Accept: 'application/json'}
           });
           if (res.ok) {
             btn.textContent = 'Message Sent';
@@ -1652,7 +1665,7 @@
         } catch {
           btn.textContent = 'Error — Try Again';
         }
-        setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 3000);
+        setTimeout(() => {btn.textContent = original; btn.disabled = false;}, 3000);
       });
     }
 
@@ -1681,4 +1694,5 @@
     }
   </script>
 </body>
+
 </html>
