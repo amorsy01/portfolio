@@ -953,55 +953,42 @@
 
       /* MODAL — critical scroll fix */
       /* MODAL — mobile scroll fix */
+      /* MODAL — iOS Safari bulletproof scroll */
       .modal {
-        display: flex;
-        flex-direction: column;
-        align-items: stretch;
-        justify-content: flex-start;
+        display: block;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
         padding: 0;
-      }
-
-      .modal.active {
-        opacity: 1;
-        pointer-events: auto;
+        touch-action: auto;
       }
 
       .modal-content {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
+        display: block;
         max-width: 100%;
         margin: 0;
-        padding: 6rem 6vw 4rem;
-        /* top padding makes room for fixed close button */
-        max-height: none;
-        overflow-y: visible;
+        padding: 5rem 6vw 4rem;
       }
 
       .modal-images {
-        order: -1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
         width: 100%;
+        margin-bottom: 2.5rem;
       }
 
       .modal-hero {
         width: 100%;
         height: auto;
-        max-height: 50vh;
-        object-fit: contain;
+        display: block;
+        margin-bottom: 0.75rem;
         border-radius: 4px;
       }
 
-      /* Single column on mobile — no masonry gaps */
       .modal-collage {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
+        display: block;
         width: 100%;
       }
 
@@ -1009,8 +996,12 @@
         width: 100%;
         height: auto;
         display: block;
+        margin-bottom: 0.75rem;
         border-radius: 4px;
-        margin: 0;
+      }
+
+      .modal-info {
+        width: 100%;
       }
 
       .modal-close {
@@ -1034,18 +1025,23 @@
 
       .modal-title {
         font-size: 1.5rem;
-        margin-top: 0.5rem;
+        margin-bottom: 1rem;
       }
 
       .modal-details {
+        display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1.5rem;
         margin: 1.5rem 0;
         padding: 1.5rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
       }
 
       .modal-desc {
         font-size: 0.9375rem;
+        line-height: 1.7;
+        color: rgba(255, 255, 255, 0.7);
       }
 
       .modal-title {
