@@ -954,24 +954,20 @@
       /* MODAL — critical scroll fix */
       /* MODAL — mobile scroll fix */
       /* MODAL — iOS Safari bulletproof scroll */
+      /* MODAL */
       .modal {
         display: block;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         padding: 0;
-        touch-action: auto;
       }
 
       .modal-content {
         display: block;
-        max-width: 100%;
-        margin: 0;
+        max-height: none;
+        overflow-y: visible;
         padding: 5rem 6vw 4rem;
+        gap: 2.5rem;
       }
 
       .modal-images {
@@ -982,9 +978,9 @@
       .modal-hero {
         width: 100%;
         height: auto;
-        display: block;
+        max-height: 45vh;
+        object-fit: contain;
         margin-bottom: 0.75rem;
-        border-radius: 4px;
       }
 
       .modal-collage {
@@ -997,11 +993,6 @@
         height: auto;
         display: block;
         margin-bottom: 0.75rem;
-        border-radius: 4px;
-      }
-
-      .modal-info {
-        width: 100%;
       }
 
       .modal-close {
@@ -1010,42 +1001,13 @@
         right: 1rem;
         width: 44px;
         height: 44px;
-        background: rgba(10, 10, 10, 0.7);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        background: rgba(10, 10, 10, 0.6);
+        backdrop-filter: blur(4px);
         z-index: 10;
-        border-radius: 50%;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        color: #fff;
-        font-size: 1.5rem;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
 
       .modal-title {
         font-size: 1.5rem;
-        margin-bottom: 1rem;
-      }
-
-      .modal-details {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-        padding: 1.5rem 0;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .modal-desc {
-        font-size: 0.9375rem;
-        line-height: 1.7;
-        color: rgba(255, 255, 255, 0.7);
-      }
-
-      .modal-title {
-        font-size: 1.75rem;
       }
 
       .modal-details {
@@ -1591,6 +1553,10 @@
       document.body.style.overflow = 'hidden';
       lenis.stop();
 
+      // CRITICAL: Block Lenis from stealing wheel events on desktop
+      modalWheelHandler = (e) => e.stopPropagation();
+      modalContent.addEventListener('wheel', modalWheelHandler, {passive: true});
+
       gsap.from('.modal-hero', {
         y: 30, opacity: 0, duration: 0.7, ease: "power3.out",
         clearProps: "transform"
@@ -1613,7 +1579,6 @@
         modalWheelHandler = null;
       }
     }
-
     modalClose.addEventListener('click', closeModal);
     modal.addEventListener('click', (e) => {if (e.target === modal) closeModal();});
 
