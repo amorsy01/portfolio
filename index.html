@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Gallery — Architectural Design</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <style>
+    :root {
+      --bg: #f5f5f0;
+      --fg: #0a0a0a;
+      --muted: #888888;
+      --accent: #c2b280;
+      --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html.lenis,
+    html.lenis body {
+      height: auto;
+    }
+
+    .lenis.lenis-smooth {
+      scroll-behavior: auto !important;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* =========================================================
+       CUSTOM CURSOR — Hollow ring style, visible on all backgrounds
+       ========================================================= */
+    .cursor {
+      position: fixed;
+      width: 28px;
+      height: 28px;
+      border: 2px solid #fff;
+      /* was 1.5px — thicker */
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: difference;
+      transition: width 0.3s var(--ease-expo), height 0.3s var(--ease-expo), background 0.3s, border-color 0.3s;
+      transform: translate(-50%, -50%);
+      box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
+      /* dark inner ring */
+    }
+
+    .cursor::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 4px;
+      height: 4px;
+      background: #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.4);
+      /* dark halo around dot */
+    }
+
+    .cursor.hover {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cursor.view {
+      width: 84px;
+      height: 84px;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: transparent;
+    }
+
+    .cursor.view::after {
+      content: 'VIEW';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      color: #fff;
+    }
+
+    /* Preloader */
+    .preloader {
+      position: fixed;
+      inset: 0;
+      background: var(--fg);
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .preloader-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 100;
+      color: var(--bg);
+      overflow: hidden;
+    }
+
+    .preloader-text span {
+      display: inline-block;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 2rem 4vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      mix-blend-mode: difference;
+      transition: transform 0.6s var(--ease-expo);
+    }
+
+    nav.hidden {
+      transform: translateY(-100%);
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 0.875rem;
+      font-weight: 400;
+      color: #fff;
+      text-decoration: none;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: opacity 0.3s;
+      text-shadow: 0 0 2px rgba(0, 0, 0, 0.15);
+      /* safety net for mid-tone skies */
+    }
+
+    .nav-links a:hover {
+      opacity: 0.6;
+    }
+
+    .nav-links a:hover {
+      color: #fff;
+    }
+
+    /* Hero */
+    .hero {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 4vw;
+      padding-bottom: 6vh;
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .hero-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.2);
+      filter: brightness(0.7);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 1.5rem;
+      overflow: hidden;
+    }
+
+    .hero-label span {
+      display: inline-block;
+    }
+
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(3rem, 10vw, 9rem);
+      font-weight: 300;
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      color: #fff;
+      max-width: 90vw;
+    }
+
+    .hero-title .line {
+      display: block;
+      overflow: hidden;
+    }
+
+    .hero-title .line span {
+      display: inline-block;
+    }
+
+    .hero-title .line span,
+    .hero-label span,
+    .hero-meta span {
+      opacity: 0;
+    }
+
+    .hero-meta {
+      margin-top: 3rem;
+      display: flex;
+      gap: 4rem;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 0.875rem;
+    }
+
+    .hero-meta div {
+      overflow: hidden;
+    }
+
+    .hero-meta span {
+      display: inline-block;
+    }
+
+    /* Sections General */
+    section {
+      position: relative;
+    }
+
+    /* About */
+    .about {
+      padding: 20vh 4vw;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 8vw;
+      align-items: start;
+    }
+
+    .about-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      color: var(--muted);
+      position: sticky;
+      top: 20vh;
+    }
+
+    .about-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
+      font-weight: 300;
+      line-height: 1.4;
+      letter-spacing: -0.01em;
+    }
+
+    .about-text .word {
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .about-text .word span {
+      display: inline-block;
+    }
+
+    /* Projects */
+    .projects-section {
+      padding: 10vh 4vw 20vh;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 6rem;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.5rem);
+      font-weight: 300;
+      letter-spacing: -0.02em;
+    }
+
+    .section-count {
+      font-size: 0.875rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 2rem;
+    }
+
+    .project-card {
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .project-card:nth-child(odd) {
+      grid-column: 1 / 7;
+    }
+
+    .project-card:nth-child(even) {
+      grid-column: 7 / 13;
+      margin-top: 15vh;
+    }
+
+    .project-card:nth-child(3n) {
+      grid-column: 3 / 9;
+    }
+
+    .project-image-wrap {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+      background: #e5e5e0;
+    }
+
+    .project-image-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: scale(1.1);
+      transition: transform 1.2s var(--ease-expo);
+    }
+
+    .project-card:hover .project-image-wrap img {
+      transform: scale(1.0);
+    }
+
+    .project-info {
+      margin-top: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .project-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .project-meta {
+      font-size: 0.75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* Reveal mask */
+    .reveal-mask {
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 2;
+      transform-origin: right;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 10, 10, 0.95);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s var(--ease-expo);
+      padding: 4vh 4vw;
+    }
+
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .modal-content {
+      max-width: 1200px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 4rem;
+      color: #fff;
+    }
+
+    /* Hero image: full width, natural height */
+    .modal-hero {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      opacity: 1 !important;
+    }
+
+    .modal-collage {
+      column-count: 2;
+      column-gap: 0.75rem;
+    }
+
+    .modal-collage img {
+      width: 100%;
+      height: auto;
+      display: block;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+      break-inside: avoid;
+      opacity: 1 !important;
+    }
+
+    .modal-hero {
+      transition: transform 0.5s var(--ease-expo), filter 0.4s;
+      cursor: zoom-in;
+    }
+
+    .modal-hero:hover {
+      transform: scale(1.03);
+      filter: brightness(1.08);
+    }
+
+    .modal-collage img {
+      transition: transform 0.5s var(--ease-expo), filter 0.4s;
+      cursor: zoom-in;
+    }
+
+    .modal-collage img:hover {
+      transform: scale(1.04);
+      filter: brightness(1.08);
+    }
+
+    /* Lightbox */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(10, 10, 10, 0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s var(--ease-expo);
+      padding: 4vw;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 85vh;
+      object-fit: contain;
+      border-radius: 4px;
+      transform: scale(0.96);
+      transition: transform 0.5s var(--ease-expo);
+    }
+
+    .lightbox.active img {
+      transform: scale(1);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .lightbox-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .lightbox-caption {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+    }
+
+    @media (max-width: 768px) {
+      .modal-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .modal-collage {
+        column-count: 1;
+      }
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .modal-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-detail h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-detail p {
+      font-size: 0.9375rem;
+    }
+
+    .modal-desc {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* =========================================================
+       CONTACT SECTION
+       ========================================================= */
+    .contact-section {
+      padding: 15vh 4vw;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 10vw;
+      max-width: 1200px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    .contact-form {
+      width: 100%;
+    }
+
+    .contact-form .form-group {
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-form .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .contact-form .form-group input,
+    .contact-form .form-group textarea {
+      width: 100%;
+      padding: 1rem 0;
+      border: none;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--fg);
+      transition: border-color 0.3s;
+    }
+
+    .contact-form .form-group input::placeholder,
+    .contact-form .form-group textarea::placeholder {
+      color: rgba(0, 0, 0, 0.25);
+    }
+
+    .contact-form .form-group input:focus,
+    .contact-form .form-group textarea:focus {
+      outline: none;
+      border-bottom-color: var(--fg);
+    }
+
+    .contact-form .form-group textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      display: inline-block;
+      padding: 1rem 2.5rem;
+      background: var(--fg);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .submit-btn:hover {
+      background: #333;
+      transform: translateY(-2px);
+    }
+
+    .submit-btn:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+
+    .contact-alt {
+      padding-top: 0.5rem;
+    }
+
+    .contact-alt h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.01em;
+    }
+
+    .contact-alt>p {
+      font-size: 0.9375rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 2.5rem;
+      max-width: 320px;
+    }
+
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.875rem 1.75rem;
+      background: var(--fg);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      transition: all 0.3s;
+    }
+
+    .contact-btn:hover {
+      background: #333;
+      transform: translateY(-1px);
+    }
+
+    .copy-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.8125rem;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .copy-btn:hover {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    .copy-btn.copied {
+      background: #27ae60;
+      border-color: #27ae60;
+      color: #fff;
+    }
+
+    .copy-btn.copied svg {
+      stroke: #fff;
+    }
+
+    /* Footer */
+    footer {
+      padding: 15vh 4vw 6vh;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 4rem;
+    }
+
+    .footer-brand {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem;
+      font-weight: 300;
+    }
+
+    .footer-col h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-col a,
+    .footer-col p {
+      display: block;
+      color: var(--fg);
+      text-decoration: none;
+      margin-bottom: 0.75rem;
+      font-size: 0.9375rem;
+      transition: color 0.3s;
+    }
+
+    .footer-col a:hover {
+      color: var(--muted);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .about {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      .about-label {
+        position: static;
+      }
+
+      .project-card:nth-child(n) {
+        grid-column: 1 / -1;
+        margin-top: 0;
+      }
+
+      .projects-grid {
+        gap: 4rem;
+      }
+
+      .modal-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+
+      footer {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+      }
+
+      .nav-links {
+        display: none;
+      }
+
+      body {
+        cursor: auto;
+      }
+
+      .cursor {
+        display: none;
+      }
+
+      .contact-grid {
+        grid-template-columns: 1fr;
+        gap: 4rem;
+      }
+
+      .contact-alt {
+        padding-top: 0;
+      }
+    }
+
+    /* Smooth image loading */
+    img {
+      opacity: 0;
+      transition: opacity 0.8s;
+    }
+
+    img.loaded {
+      opacity: 1;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+
+  <!-- Preloader -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-text">
+      <span>T</span><span>H</span><span>E</span><span>&nbsp;</span><span>G</span><span>A</span><span>L</span><span>L</span><span>E</span><span>R</span><span>Y</span>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav id="navbar">
+    <a href="#" class="logo">The Gallery</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero-bg">
+      <!-- CHANGE THIS SRC: Replace with your own hero image URL -->
+      <img src="images/Hero.jpg" alt="Architecture" id="hero-img">
+    </div>
+    <div class="hero-content">
+      <div class="hero-label"><span>Junior Architect — Computational Designer</span></div>
+      <h1 class="hero-title">
+        <span class="line"><span>ABDELRAHMAN</span></span>
+        <span class="line"><span>YASSER MORSY</span></span>
+      </h1>
+      <div class="hero-meta">
+        <div><span>Graduated 26' — Based in Cairo</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about" id="about">
+    <div class="about-label">Philosophy</div>
+    <div class="about-text" id="about-text">
+      My vision goes beyond creating aesthetically pleasing livable spaces, by creating an experience for the users to always look back to. I realized that, as architects, we create lifestyles, habits, and memories.
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="projects-section" id="projects">
+    <div class="section-header">
+      <h2 class="section-title">Selected Works</h2>
+      <span class="section-count" id="project-count">00 Projects</span>
+    </div>
+    <div class="projects-grid" id="projects-grid">
+      <!-- Projects injected by JS -->
+    </div>
+  </section>
+
+  <!-- =========================================================
+       CONTACT SECTION — Form + JS-protected email
+       ========================================================= -->
+  <section class="contact-section" id="contact">
+    <div class="contact-grid">
+      <div>
+        <h2 class="section-title" style="margin-bottom:3rem;">Get in Touch</h2>
+        <!-- CHANGE THIS: Replace YOUR_FORM_ID with your actual Formspree form endpoint -->
+        <form action="https://formspree.io/f/mwvggldr" method="POST" class="contact-form" id="contact-form">
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" name="name" required placeholder="Your name">
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" name="email" required placeholder="your@email.com">
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea name="message" required placeholder="Send me your message directly..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn">Send Message</button>
+        </form>
+      </div>
+      <div class="contact-alt">
+        <h3>Prefer email?</h3>
+        <p>You can also reach me directly. Click below to copy my address.</p>
+        <!-- This href is set by JavaScript — never contains the raw email in HTML -->
+        <a href="#" id="email-link" class="contact-btn">Open Email App</a>
+        <br style="display:block; margin-bottom:0.75rem;">
+        <button class="copy-btn" onclick="copyEmail()" id="copy-btn">
+          <span id="copy-text">Copy Email</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" />
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-brand"> Building Timeless Architecture.</div>
+    <div class="footer-col">
+      <h4>Contact</h4>
+      <p>+02 010 616 999 16</p>
+      <p>Heliopolis,<br>Cairo, Egypt</p>
+    </div>
+    <div class="footer-col">
+      <h4>Social</h4>
+      <!-- CHANGE THESE # to your real profile URLs -->
+      <a href="https://www.instagram.com/abdelrahman_yasser02" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://www.linkedin.com/in/amorsy12370" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://www.behance.net/abdel-yasser" target="_blank" rel="noopener">Behance</a>
+    </div>
+  </footer>
+
+  <!-- Project Modal -->
+  <div class="modal" id="modal">
+    <button class="modal-close" id="modal-close">&times;</button>
+    <div class="modal-content" id="modal-content"></div>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">&times;</button>
+    <img src="" alt="" id="lightbox-img">
+    <span class="lightbox-caption" id="lightbox-caption"></span>
+  </div>
+
+  <script>
+    // ============================
+    // PROJECT DATA — EDIT THIS ARRAY (or use admin.html to manage it)
+    // ============================
+    const PROJECTS = [
+      {
+        "id": 1785759658406,
+        "title": "MIDAR Public Library",
+        "category": "Public",
+        "year": "2026",
+        "location": "Mostakbal City, Cairo, Egypt",
+        "area": "1,000 m²",
+        "description": "The concept is rooted in the idea of knowledge as a constant within an ever-evolving urban environment. The library is expressed as a simple, calm, and timeless architectural form that represents stability and clarity, while a dynamic responsive façade\ncontinuously interacts with light, movement, and the city’s changing rhythm, creating a\nbalance between performance and transformation",
+        "cover": "images/Project-2/00.png",
+        "images": [
+          "images/Project-2/00.png",
+          "images/Project-2/FORM.gif",
+          "images/Project-2/01.jpg",
+          "images/Project-2/02.png",
+          "images/Project-2/03.jpg",
+          "images/Project-2/04.png",
+          "images/Project-2/05.png",
+          "images/Project-2/06.jpg",
+          "images/Project-2/07.jpg",
+          "images/Project-2/08.jpg",
+          "images/Project-2/09.jpg",
+          "images/Project-2/10.jpg",
+          "images/Project-2/11.jpg",
+          "images/Project-2/12.jpg",
+          "images/Project-2/13.jpg",
+          "images/Project-2/14.jpg",
+          "images/Project-2/15.png",
+        ]
+      },
+      {
+        "id": 1785786660178,
+        "title": "Fiber/Ground",
+        "category": "Industrial",
+        "year": "2026",
+        "location": "Dandarah, Qena, Egypt",
+        "area": "60,000 m²",
+        "description": "Fiber/Ground is an Agro-Fiber Material Innovation Campus proposed for Dandarah, Qena,\nin Upper Egypt. It tackles a regional paradox: sugarcane bagasse, an abundant agricultural waste product, is discarded every season while Qena faces severe housing shortages.\nThe project closes that loop — production facility, research lab, prototype village, and farmland in one, turning bagasse into Compressed Agro-Fiber (CAF) panels tested in real, inhabited housing prototypes.",
+        "cover": "images/Project-1/00.png",
+        "images": [
+          "images/Project-1/00.png",
+          "images/Project-1/GIF.gif",
+          "images/Project-1/01.jpg",
+          "images/Project-1/02.png",
+          "images/Project-1/03.png",
+          "images/Project-1/04.png",
+          "images/Project-1/05.png",
+          "images/Project-1/06.png",
+          "images/Project-1/07.png",
+          "images/Project-1/08.png",
+          "images/Project-1/09.png",
+          "images/Project-1/10.png",
+          "images/Project-1/11.png",
+          "images/Project-1/12.png",
+          "images/Project-1/13.png"
+        ]
+      },
+      {
+        "id": 1785843549920,
+        "title": "Helix Hotel",
+        "category": "Hospitality",
+        "year": "2025",
+        "location": "Rosetta, Egypt",
+        "area": "5,000 m²",
+        "description": "For years Rosetta was the capital of sails manufacturing, it has become the identity of the city since it depends on the fishing practice.\nThese sailing boats move by forces that affect the lifestyle of the city itself.\n\nWhen a sailboat is static, the forces acting on the boat are in balance. So, the boat stays in equilibrium. The two main forces acting on a stationary sailboat are wind lift force (Sail) and water resistance (Keel).",
+        "cover": "images/Project-3/00.png",
+        "images": [
+          "images/Project-3/00.png",
+          "images/Project-3/01.png",
+          "images/Project-3/FORM.gif",
+          "images/Project-3/02.jpg",
+          "images/Project-3/05.jpg",
+          "images/Project-3/03.jpg",
+          "images/Project-3/04.jpg",
+          "images/Project-3/06.jpg",
+          "images/Project-3/07.jpg",
+          "images/Project-3/08.png",
+          "images/Project-3/09.png",
+        ]
+      },
+      {
+        "id": 1785845983759,
+        "title": "Degravity",
+        "category": "Hospitality",
+        "year": "2025",
+        "location": "Rosetta, Egypt",
+        "area": "50",
+        "description": "In a world where rising water levels are inevitable, DEGRAVITY emerges as a defiant response, a chalet that floats THROUGH the challenge, not beneath it. Built on the principles of zero gravity and deconstruction, it breaks free from traditional forms. Each unit stands independently, yet remains connected through a fluid network of passageways. A space where architecture drifts, adapts, and redefines the future of coastal living. The vision is not to avoid the problem, but to co-exist with it by integrating the water in the design experience of the chalet.",
+        "cover": "images/Project-4/00.png",
+        "images": [
+          "images/Project-4/00.png",
+          "images/Project-4/10.png",
+          "images/Project-4/02.jpg",
+          "images/Project-4/03.png",
+          "images/Project-4/04.png",
+          "images/Project-4/01.jpg",
+          "images/Project-4/05.png",
+          "images/Project-4/06.png",
+          "images/Project-4/07.png",
+          "images/Project-4/08.png",
+          "images/Project-4/09.png"
+        ]
+      }
+    ];
+
+    // ============================
+    // INIT
+    // ============================
+    gsap.registerPlugin(ScrollTrigger);
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smooth: true
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    requestAnimationFrame(raf);
+
+    lenis.on('scroll', ScrollTrigger.update);
+    gsap.ticker.add((time) => {lenis.raf(time * 1000);});
+    gsap.ticker.lagSmoothing(0);
+
+    // ============================
+    // CUSTOM CURSOR
+    // ============================
+    const cursor = document.getElementById('cursor');
+    let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX; mouseY = e.clientY;
+    });
+
+    function animateCursor() {
+      cursorX += (mouseX - cursorX) * 0.15;
+      cursorY += (mouseY - cursorY) * 0.15;
+      cursor.style.left = cursorX + 'px';
+      cursor.style.top = cursorY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    document.querySelectorAll('a, button, .project-card').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        if (el.classList.contains('project-card')) cursor.classList.add('view');
+        else cursor.classList.add('hover');
+      });
+      el.addEventListener('mouseleave', () => cursor.classList.remove('hover', 'view'));
+    });
+
+    // ============================
+    // PRELOADER
+    // ============================
+    const preloader = document.getElementById('preloader');
+    const preloaderChars = preloader.querySelectorAll('span');
+
+    gsap.to(preloaderChars, {
+      y: -20,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.05,
+      ease: "power3.inOut",
+      delay: 0.5,
+      onComplete: () => {
+        gsap.to(preloader, {
+          yPercent: -100,
+          duration: 1.2,
+          ease: "power4.inOut",
+          onComplete: () => {
+            preloader.style.display = 'none';
+            initAnimations();
+          }
+        });
+      }
+    });
+
+    // ============================
+    // RENDER PROJECTS
+    // ============================
+    const grid = document.getElementById('projects-grid');
+    const countEl = document.getElementById('project-count');
+
+    countEl.textContent = `${String(PROJECTS.length).padStart(2, '0')} Projects`;
+
+    PROJECTS.forEach((proj) => {
+      const card = document.createElement('div');
+      card.className = 'project-card';
+      card.innerHTML = `
+    <div class="project-image-wrap">
+      <div class="reveal-mask"></div>
+      <img src="${proj.cover}" alt="${proj.title}" loading="lazy">
+    </div>
+    <div class="project-info">
+      <h3 class="project-name">${proj.title}</h3>
+      <span class="project-meta">${proj.category} — ${proj.year}</span>
+    </div>
+  `;
+      card.addEventListener('click', () => openModal(proj));
+      grid.appendChild(card);
+    });
+
+    document.querySelectorAll('img').forEach(img => {
+      if (img.complete) img.classList.add('loaded');
+      else img.onload = () => img.classList.add('loaded');
+    });
+
+    // ============================
+    // ANIMATIONS
+    // ============================
+    function initAnimations() {
+      gsap.to('#hero-img', {
+        yPercent: 30,
+        scale: 1,
+        ease: "none",
+        scrollTrigger: {
+          trigger: '.hero',
+          start: 'top top',
+          end: 'bottom top',
+          scrub: true
+        }
+      });
+
+      gsap.fromTo('.hero-title .line span',
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.2}
+      );
+      gsap.fromTo('.hero-label span',
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1, ease: "power4.out"}
+      );
+      gsap.fromTo('.hero-meta span',
+        {yPercent: 100, autoAlpha: 0},
+        {yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.6}
+      );
+
+      const aboutText = document.getElementById('about-text');
+      const words = aboutText.textContent.split(' ');
+      aboutText.innerHTML = words.map(w => `<span class="word"><span>${w}</span></span>`).join(' ');
+
+      gsap.to('.about-text .word span', {
+        yPercent: 0,
+        duration: 1.2,
+        stagger: 0.03,
+        ease: "power4.out",
+        scrollTrigger: {
+          trigger: '.about',
+          start: 'top 70%',
+          toggleActions: 'play none none reverse'
+        }
+      });
+
+      document.querySelectorAll('.project-card').forEach((card) => {
+        const mask = card.querySelector('.reveal-mask');
+        const img = card.querySelector('img');
+        const info = card.querySelector('.project-info');
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: card,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+
+        tl.to(mask, {scaleX: 0, duration: 1.2, ease: "power4.inOut"})
+          .to(img, {scale: 1, duration: 1.4, ease: "power3.out"}, "-=0.8")
+          .from(info.children, {y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out"}, "-=0.6");
+      });
+
+      gsap.from('.section-header', {
+        y: 60,
+        opacity: 0,
+        duration: 1,
+        ease: "power3.out",
+        scrollTrigger: {trigger: '.section-header', start: 'top 85%'}
+      });
+
+      gsap.from('.contact-grid > *', {
+        y: 60,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.2,
+        ease: "power3.out",
+        scrollTrigger: {trigger: '.contact-section', start: 'top 75%'}
+      });
+
+      gsap.from('footer > *', {
+        y: 40,
+        opacity: 0,
+        duration: 1,
+        stagger: 0.15,
+        ease: "power3.out",
+        scrollTrigger: {trigger: 'footer', start: 'top 85%'}
+      });
+    }
+
+    // ============================
+    // NAV HIDE/SHOW
+    // ============================
+    let lastScroll = 0;
+    const navbar = document.getElementById('navbar');
+
+    lenis.on('scroll', ({scroll}) => {
+      if (scroll > lastScroll && scroll > 100) navbar.classList.add('hidden');
+      else navbar.classList.remove('hidden');
+      lastScroll = scroll;
+    });
+
+    // ============================
+    // MODAL
+    // ============================
+    const modal = document.getElementById('modal');
+    const modalContent = document.getElementById('modal-content');
+    const modalClose = document.getElementById('modal-close');
+    let modalWheelHandler = null;
+
+    function openModal(proj) {
+      const images = (proj.images && proj.images.length > 0)
+        ? proj.images
+        : [proj.cover];
+
+      const hero = images[0];
+      const rest = images.slice(1);
+
+      modalContent.innerHTML = `
+    <div class="modal-images">
+      <img src="${hero}" alt="${proj.title}" class="modal-hero">
+      <div class="modal-collage">
+        ${rest.map((img, i) => `<img src="${img}" alt="${proj.title} ${i + 2}" loading="lazy">`).join('')}
+      </div>
+    </div>
+    <div class="modal-info">
+      <span class="project-meta">${proj.category} / ${proj.year}</span>
+      <h2 class="modal-title">${proj.title}</h2>
+      <div class="modal-details">
+        <div class="modal-detail">
+          <h4>Location</h4>
+          <p>${proj.location}</p>
+        </div>
+        <div class="modal-detail">
+          <h4>Area</h4>
+          <p>${proj.area}</p>
+        </div>
+      </div>
+      <p class="modal-desc">${proj.description}</p>
+    </div>
+  `;
+
+      // DIRECT LISTENERS: attach to each image immediately after DOM insertion
+      modalContent.querySelectorAll('.modal-images img').forEach(img => {
+        img.addEventListener('click', function () {
+          console.log('Image clicked:', this.src); // debug
+          openLightbox(this.src, this.alt);
+        });
+      });
+
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      lenis.stop();
+
+      modalWheelHandler = (e) => e.stopPropagation();
+      modalContent.addEventListener('wheel', modalWheelHandler, {passive: true});
+
+      gsap.from('.modal-hero', {
+        y: 30, opacity: 0, duration: 0.7, ease: "power3.out",
+        clearProps: "transform"
+      });
+      gsap.from('.modal-collage img', {
+        y: 30, opacity: 0, duration: 0.5, stagger: 0.05, ease: "power3.out", delay: 0.1,
+        clearProps: "transform"
+      });
+      gsap.from('.modal-info > *', {
+        y: 20, opacity: 0, duration: 0.6, stagger: 0.1, ease: "power3.out", delay: 0.2
+      });
+    }
+
+    function closeModal() {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      lenis.start();
+      if (modalWheelHandler) {
+        modalContent.removeEventListener('wheel', modalWheelHandler, {passive: true});
+        modalWheelHandler = null;
+      }
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modal.addEventListener('click', (e) => {if (e.target === modal) closeModal();});
+
+    // ============================
+    // LIGHTBOX — Event Delegation (bulletproof)
+    // ============================
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxCaption = document.getElementById('lightbox-caption');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    function openLightbox(src, caption) {
+      lightboxImg.src = src;
+      lightboxCaption.textContent = caption;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+      setTimeout(() => {
+        lightboxImg.src = '';
+        lightboxCaption.textContent = '';
+      }, 400);
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // ============================
+    // KEYBOARD HANDLERS
+    // ============================
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (lightbox.classList.contains('active')) closeLightbox();
+        else if (modal.classList.contains('active')) closeModal();
+      }
+    });
+
+    // ============================
+    // SMOOTH SCROLL NAV
+    // ============================
+    document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) lenis.scrollTo(target);
+      });
+    });
+
+    // ============================
+    // PROTECTED EMAIL
+    // ============================
+    const emailUser = "studio";
+    const emailDomain = "gmail";
+    const emailTld = "com";
+    const studioEmail = emailUser + "@" + emailDomain + "." + emailTld;
+
+    const emailLink = document.getElementById('email-link');
+    if (emailLink) {
+      emailLink.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.location.href = "mailto:" + studioEmail;
+      });
+    }
+
+    function copyEmail() {
+      navigator.clipboard.writeText(studioEmail).then(() => {
+        const btn = document.getElementById('copy-btn');
+        const text = document.getElementById('copy-text');
+        if (!btn || !text) return;
+        btn.classList.add('copied');
+        text.textContent = 'Copied!';
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          text.textContent = 'Copy Email';
+        }, 2000);
+      });
+    }
+
+    // ============================
+    // CONTACT FORM
+    // ============================
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+      contactForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = contactForm.querySelector('button[type="submit"]');
+        const original = btn.textContent;
+        btn.textContent = 'Sending...';
+        btn.disabled = true;
+
+        try {
+          const res = await fetch(contactForm.action, {
+            method: 'POST',
+            body: new FormData(contactForm),
+            headers: {Accept: 'application/json'}
+          });
+          if (res.ok) {
+            btn.textContent = 'Message Sent';
+            contactForm.reset();
+          } else {
+            btn.textContent = 'Error — Try Again';
+          }
+        } catch {
+          btn.textContent = 'Error — Try Again';
+        }
+        setTimeout(() => {btn.textContent = original; btn.disabled = false;}, 3000);
+      });
+    }
+
+  </script>
+</body>
+
+</html>
