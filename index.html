@@ -45,14 +45,13 @@
     }
 
     /* =========================================================
-       CUSTOM CURSOR — Hollow ring style, visible on all backgrounds
+       CUSTOM CURSOR
        ========================================================= */
     .cursor {
       position: fixed;
       width: 28px;
       height: 28px;
       border: 2px solid #fff;
-      /* was 1.5px — thicker */
       border-radius: 50%;
       pointer-events: none;
       z-index: 9999;
@@ -60,7 +59,6 @@
       transition: width 0.3s var(--ease-expo), height 0.3s var(--ease-expo), background 0.3s, border-color 0.3s;
       transform: translate(-50%, -50%);
       box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.35);
-      /* dark inner ring */
     }
 
     .cursor::before {
@@ -74,7 +72,6 @@
       border-radius: 50%;
       transform: translate(-50%, -50%);
       box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.4);
-      /* dark halo around dot */
     }
 
     .cursor.hover {
@@ -168,15 +165,14 @@
       text-transform: uppercase;
       transition: opacity 0.3s;
       text-shadow: 0 0 2px rgba(0, 0, 0, 0.15);
-      /* safety net for mid-tone skies */
     }
 
     .nav-links a:hover {
       opacity: 0.6;
     }
 
-    .nav-links a:hover {
-      color: #fff;
+    .menu-toggle {
+      display: none;
     }
 
     /* Hero */
@@ -406,6 +402,7 @@
       transform-origin: right;
     }
 
+    /* Modal */
     .modal {
       position: fixed;
       inset: 0;
@@ -418,9 +415,6 @@
       pointer-events: none;
       transition: opacity 0.6s var(--ease-expo);
       padding: 4vh 4vw;
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
     }
 
     .modal.active {
@@ -441,7 +435,12 @@
       color: #fff;
     }
 
-    /* Hero image: full width, natural height */
+    .modal-images {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
     .modal-hero {
       width: 100%;
       height: auto;
@@ -449,6 +448,13 @@
       border-radius: 4px;
       margin-bottom: 0.75rem;
       opacity: 1 !important;
+      transition: transform 0.5s var(--ease-expo), filter 0.4s;
+      cursor: zoom-in;
+    }
+
+    .modal-hero:hover {
+      transform: scale(1.03);
+      filter: brightness(1.08);
     }
 
     .modal-collage {
@@ -464,19 +470,6 @@
       margin-bottom: 0.75rem;
       break-inside: avoid;
       opacity: 1 !important;
-    }
-
-    .modal-hero {
-      transition: transform 0.5s var(--ease-expo), filter 0.4s;
-      cursor: zoom-in;
-    }
-
-    .modal-hero:hover {
-      transform: scale(1.03);
-      filter: brightness(1.08);
-    }
-
-    .modal-collage img {
       transition: transform 0.5s var(--ease-expo), filter 0.4s;
       cursor: zoom-in;
     }
@@ -484,6 +477,64 @@
     .modal-collage img:hover {
       transform: scale(1.04);
       filter: brightness(1.08);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      width: 48px;
+      height: 48px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      background: transparent;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s;
+      z-index: 10;
+    }
+
+    .modal-close:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 300;
+      margin-bottom: 1rem;
+    }
+
+    .modal-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+      padding: 2rem 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .modal-detail h4 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255, 255, 255, 0.5);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-detail p {
+      font-size: 0.9375rem;
+    }
+
+    .modal-desc {
+      font-size: 1rem;
+      line-height: 1.7;
+      color: rgba(255, 255, 255, 0.7);
     }
 
     /* Lightbox */
@@ -553,588 +604,7 @@
       letter-spacing: 0.05em;
     }
 
-    /* =========================================================
-   MOBILE OPTIMIZATIONS
-   ========================================================= */
-    @media (max-width: 768px) {
-
-      /* Consistent horizontal padding across ALL sections */
-      .hero,
-      .projects-section,
-      .contact-section,
-      footer {
-        padding-left: 6vw;
-        padding-right: 6vw;
-      }
-
-      /* Typography */
-      .hero-title {
-        font-size: clamp(2.5rem, 12vw, 4rem);
-        line-height: 1.0;
-      }
-
-      .hero-meta {
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 2rem;
-      }
-
-      .hero {
-        padding-bottom: 8vh;
-      }
-
-      /* About */
-      .about {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 12vh 6vw;
-      }
-
-      .about-label {
-        position: static;
-        margin-bottom: 1rem;
-      }
-
-      .about-text {
-        font-size: clamp(1.25rem, 5vw, 1.75rem);
-      }
-
-      /* Navigation — Hamburger */
-      .nav-links {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100vh;
-        background: var(--fg);
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        transform: translateX(100%);
-        transition: transform 0.5s var(--ease-expo);
-        mix-blend-mode: normal;
-        z-index: 99;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: flex;
-      }
-
-      .nav-links.open {
-        transform: translateX(0);
-      }
-
-      .nav-links a {
-        font-size: 1.5rem;
-        color: #fff;
-      }
-
-      .menu-toggle {
-        display: block;
-        position: relative;
-        z-index: 101;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.5rem;
-        mix-blend-mode: difference;
-      }
-
-      .menu-toggle span {
-        display: block;
-        width: 24px;
-        height: 1.5px;
-        background: #fff;
-        margin: 6px 0;
-        transition: 0.3s;
-      }
-
-      .menu-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-      }
-
-      .menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .menu-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px);
-      }
-
-      /* Projects */
-      .projects-section {
-        padding-top: 8vh;
-        padding-bottom: 12vh;
-      }
-
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-bottom: 3rem;
-      }
-
-      .project-card:nth-child(n) {
-        grid-column: 1 / -1;
-        margin-top: 0;
-      }
-
-      .projects-grid {
-        gap: 3rem;
-      }
-
-      .project-image-wrap {
-        aspect-ratio: 4 / 3;
-      }
-
-      /* MODAL — critical scroll fix */
-      .modal {
-        display: block;
-        overflow-y: auto;
-        padding: 0;
-        -webkit-overflow-scrolling: touch;
-      }
-
-      .modal.active {
-        align-items: unset;
-        justify-content: unset;
-      }
-
-      .modal-content {
-        grid-template-columns: 1fr;
-        gap: 2.5rem;
-        max-width: 100%;
-        margin: 0;
-        padding: 8vh 6vw 6vh;
-        max-height: none;
-        overflow-y: visible;
-      }
-
-      .modal-images {
-        order: -1;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-      }
-
-      .modal-hero {
-        width: 100%;
-        max-height: 40vh;
-        object-fit: contain;
-        border-radius: 4px;
-      }
-
-      .modal-collage {
-        column-count: 2;
-        column-gap: 0.5rem;
-      }
-
-      .modal-collage img {
-        width: 100%;
-        height: auto;
-        display: block;
-        border-radius: 4px;
-        margin-bottom: 0.5rem;
-        break-inside: avoid;
-        opacity: 1 !important;
-      }
-
-      .modal-close {
-        position: fixed;
-        top: 1.5rem;
-        right: 1.5rem;
-        width: 44px;
-        height: 44px;
-        z-index: 10;
-        background: rgba(10, 10, 10, 0.6);
-        backdrop-filter: blur(4px);
-      }
-
-      .modal-title {
-        font-size: 1.75rem;
-      }
-
-      .modal-details {
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-        padding: 1.5rem 0;
-      }
-
-      /* Lightbox */
-      .lightbox {
-        padding: 4vw;
-      }
-
-      .lightbox img {
-        max-height: 70vh;
-      }
-
-      .lightbox-close {
-        top: 1rem;
-        right: 1rem;
-        width: 44px;
-        height: 44px;
-      }
-
-      /* Contact */
-      .contact-section {
-        padding-top: 10vh;
-        padding-bottom: 10vh;
-      }
-
-      .contact-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-      }
-
-      .contact-alt {
-        padding-top: 0;
-      }
-
-      .contact-form .form-group {
-        margin-bottom: 1.75rem;
-      }
-
-      /* Footer */
-      footer {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        padding-top: 10vh;
-        padding-bottom: 6vh;
-      }
-
-      .footer-brand {
-        font-size: 1.5rem;
-      }
-
-      /* Utilities */
-      body {
-        cursor: auto;
-      }
-
-      .cursor {
-        display: none !important;
-      }
-
-      /* Preloader */
-      .preloader-text {
-        font-size: clamp(1.5rem, 8vw, 2.5rem);
-      }
-    }
-
-    /* Hide hamburger on desktop */
-    .menu-toggle {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-
-      /* Typography scale down */
-      .hero-title {
-        font-size: clamp(2.5rem, 12vw, 4rem);
-        line-height: 1.0;
-      }
-
-      .hero-meta {
-        flex-direction: column;
-        gap: 0.5rem;
-        margin-top: 2rem;
-      }
-
-      .hero {
-        padding: 6vw;
-        padding-bottom: 8vh;
-      }
-
-      /* About section */
-      .about {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        padding: 12vh 6vw;
-      }
-
-      .about-label {
-        position: static;
-        margin-bottom: 1rem;
-      }
-
-      .about-text {
-        font-size: clamp(1.25rem, 5vw, 1.75rem);
-      }
-
-      /* Navigation — Hamburger */
-      .nav-links {
-        position: fixed;
-        top: 0;
-        right: 0;
-        width: 100%;
-        height: 100vh;
-        background: var(--fg);
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        transform: translateX(100%);
-        transition: transform 0.5s var(--ease-expo);
-        mix-blend-mode: normal;
-        z-index: 99;
-        margin: 0;
-        padding: 0;
-        list-style: none;
-        display: flex;
-        /* override previous display:none */
-      }
-
-      .nav-links.open {
-        transform: translateX(0);
-      }
-
-      .nav-links a {
-        font-size: 1.5rem;
-        color: #fff;
-      }
-
-      .menu-toggle {
-        display: block;
-        position: relative;
-        z-index: 101;
-        background: none;
-        border: none;
-        cursor: pointer;
-        padding: 0.5rem;
-        mix-blend-mode: difference;
-      }
-
-      .menu-toggle span {
-        display: block;
-        width: 24px;
-        height: 1.5px;
-        background: #fff;
-        margin: 6px 0;
-        transition: 0.3s;
-      }
-
-      .menu-toggle.active span:nth-child(1) {
-        transform: rotate(45deg) translate(5px, 5px);
-      }
-
-      .menu-toggle.active span:nth-child(2) {
-        opacity: 0;
-      }
-
-      .menu-toggle.active span:nth-child(3) {
-        transform: rotate(-45deg) translate(6px, -6px);
-      }
-
-      /* Projects */
-      .projects-section {
-        padding: 8vh 6vw 12vh;
-      }
-
-      .section-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 1rem;
-        margin-bottom: 3rem;
-      }
-
-      .project-card:nth-child(n) {
-        grid-column: 1 / -1;
-        margin-top: 0;
-      }
-
-      .projects-grid {
-        gap: 3rem;
-      }
-
-      .project-image-wrap {
-        aspect-ratio: 3 / 4;
-        /* taller on mobile */
-      }
-
-      /* Modal */
-      .modal {
-        padding: 0;
-      }
-
-      .modal-content {
-        grid-template-columns: 1fr;
-        gap: 2rem;
-        margin: 0;
-        padding: 6vh 6vw;
-        max-height: none;
-      }
-
-      .modal-images {
-        order: -1;
-        /* images first on mobile */
-      }
-
-      .modal-hero {
-        max-height: 35vh;
-      }
-
-      .modal-collage {
-        column-count: 2;
-        column-gap: 0.5rem;
-      }
-
-      .modal-collage img {
-        margin-bottom: 0.5rem;
-      }
-
-      .modal-close {
-        top: 1rem;
-        right: 1rem;
-        width: 40px;
-        height: 40px;
-        z-index: 10;
-      }
-
-      .modal-title {
-        font-size: 1.75rem;
-      }
-
-      .modal-details {
-        grid-template-columns: 1fr 1fr;
-        gap: 1.5rem;
-        margin: 1.5rem 0;
-        padding: 1.5rem 0;
-      }
-
-      /* Lightbox */
-      .lightbox {
-        padding: 4vw;
-      }
-
-      .lightbox img {
-        max-height: 70vh;
-      }
-
-      .lightbox-close {
-        top: 1rem;
-        right: 1rem;
-        width: 40px;
-        height: 40px;
-      }
-
-      /* Contact */
-      .contact-section {
-        padding: 10vh 6vw;
-      }
-
-      .contact-grid {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-      }
-
-      .contact-alt {
-        padding-top: 0;
-      }
-
-      .contact-form .form-group {
-        margin-bottom: 1.75rem;
-      }
-
-      /* Footer */
-      footer {
-        grid-template-columns: 1fr;
-        gap: 3rem;
-        padding: 10vh 6vw 6vh;
-      }
-
-      .footer-brand {
-        font-size: 1.5rem;
-      }
-
-      /* Utilities */
-      body {
-        cursor: auto;
-      }
-
-      .cursor {
-        display: none !important;
-      }
-
-      /* Preloader */
-      .preloader-text {
-        font-size: clamp(1.5rem, 8vw, 2.5rem);
-      }
-    }
-
-    /* Hide hamburger on desktop */
-    .menu-toggle {
-      display: none;
-    }
-
-    @media (max-width: 768px) {
-      .menu-toggle {
-        display: block;
-      }
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 2rem;
-      right: 2rem;
-      width: 48px;
-      height: 48px;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      background: transparent;
-      color: #fff;
-      font-size: 1.5rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.3s;
-    }
-
-    .modal-close:hover {
-      background: rgba(255, 255, 255, 0.1);
-    }
-
-    .modal-title {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 2.5rem;
-      font-weight: 300;
-      margin-bottom: 1rem;
-    }
-
-    .modal-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin: 2rem 0;
-      padding: 2rem 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .modal-detail h4 {
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255, 255, 255, 0.5);
-      margin-bottom: 0.5rem;
-    }
-
-    .modal-detail p {
-      font-size: 0.9375rem;
-    }
-
-    .modal-desc {
-      font-size: 1rem;
-      line-height: 1.7;
-      color: rgba(255, 255, 255, 0.7);
-    }
-
-    /* =========================================================
-       CONTACT SECTION
-       ========================================================= */
+    /* Contact */
     .contact-section {
       padding: 15vh 4vw;
       border-top: 1px solid rgba(0, 0, 0, 0.1);
@@ -1325,15 +795,133 @@
       color: var(--muted);
     }
 
-    /* Responsive */
+    /* =========================================================
+       MOBILE OPTIMIZATIONS — SINGLE CLEAN BLOCK
+       ========================================================= */
     @media (max-width: 768px) {
+      body {
+        cursor: auto;
+      }
+
+      .cursor {
+        display: none !important;
+      }
+
+      /* Consistent padding */
+      .hero,
+      .projects-section,
+      .contact-section,
+      footer {
+        padding-left: 6vw;
+        padding-right: 6vw;
+      }
+
+      /* Hero */
+      .hero-title {
+        font-size: clamp(2.5rem, 12vw, 4rem);
+        line-height: 1.0;
+      }
+
+      .hero-meta {
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 2rem;
+      }
+
+      .hero {
+        padding-bottom: 8vh;
+      }
+
+      /* About */
       .about {
         grid-template-columns: 1fr;
         gap: 2rem;
+        padding: 12vh 6vw;
       }
 
       .about-label {
         position: static;
+        margin-bottom: 1rem;
+      }
+
+      .about-text {
+        font-size: clamp(1.25rem, 5vw, 1.75rem);
+      }
+
+      /* Navigation — Hamburger */
+      .nav-links {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 100%;
+        height: 100vh;
+        background: var(--fg);
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2rem;
+        transform: translateX(100%);
+        transition: transform 0.5s var(--ease-expo);
+        mix-blend-mode: normal;
+        z-index: 99;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        display: flex;
+      }
+
+      .nav-links.open {
+        transform: translateX(0);
+      }
+
+      .nav-links a {
+        font-size: 1.5rem;
+        color: #fff;
+      }
+
+      .menu-toggle {
+        display: block;
+        position: relative;
+        z-index: 101;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0.5rem;
+        mix-blend-mode: difference;
+      }
+
+      .menu-toggle span {
+        display: block;
+        width: 24px;
+        height: 1.5px;
+        background: #fff;
+        margin: 6px 0;
+        transition: 0.3s;
+      }
+
+      .menu-toggle.active span:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 5px);
+      }
+
+      .menu-toggle.active span:nth-child(2) {
+        opacity: 0;
+      }
+
+      .menu-toggle.active span:nth-child(3) {
+        transform: rotate(-45deg) translate(6px, -6px);
+      }
+
+      /* Projects */
+      .projects-section {
+        padding-top: 8vh;
+        padding-bottom: 12vh;
+      }
+
+      .section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 3rem;
       }
 
       .project-card:nth-child(n) {
@@ -1342,38 +930,119 @@
       }
 
       .projects-grid {
-        gap: 4rem;
+        gap: 3rem;
+      }
+
+      .project-image-wrap {
+        aspect-ratio: 4 / 3;
+      }
+
+      /* MODAL — critical scroll fix */
+      .modal {
+        display: block;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0;
       }
 
       .modal-content {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 2.5rem;
+        max-width: 100%;
+        margin: 0;
+        padding: 8vh 6vw 6vh;
+        max-height: none;
+        overflow-y: visible;
       }
 
-      footer {
-        grid-template-columns: 1fr;
-        gap: 3rem;
+      .modal-images {
+        order: -1;
       }
 
-      .nav-links {
-        display: none;
+      .modal-hero {
+        max-height: 40vh;
       }
 
-      body {
-        cursor: auto;
+      .modal-collage {
+        column-count: 2;
+        column-gap: 0.5rem;
       }
 
-      .cursor {
-        display: none;
+      .modal-collage img {
+        margin-bottom: 0.5rem;
+      }
+
+      .modal-close {
+        position: fixed;
+        top: 1.5rem;
+        right: 1.5rem;
+        width: 44px;
+        height: 44px;
+        background: rgba(10, 10, 10, 0.6);
+        backdrop-filter: blur(4px);
+      }
+
+      .modal-title {
+        font-size: 1.75rem;
+      }
+
+      .modal-details {
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin: 1.5rem 0;
+        padding: 1.5rem 0;
+      }
+
+      /* Lightbox */
+      .lightbox {
+        padding: 4vw;
+      }
+
+      .lightbox img {
+        max-height: 70vh;
+      }
+
+      .lightbox-close {
+        top: 1rem;
+        right: 1rem;
+        width: 44px;
+        height: 44px;
+      }
+
+      /* Contact */
+      .contact-section {
+        padding-top: 10vh;
+        padding-bottom: 10vh;
       }
 
       .contact-grid {
         grid-template-columns: 1fr;
-        gap: 4rem;
+        gap: 3rem;
       }
 
       .contact-alt {
         padding-top: 0;
+      }
+
+      .contact-form .form-group {
+        margin-bottom: 1.75rem;
+      }
+
+      /* Footer */
+      footer {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        padding-top: 10vh;
+        padding-bottom: 6vh;
+      }
+
+      .footer-brand {
+        font-size: 1.5rem;
+      }
+
+      /* Preloader */
+      .preloader-text {
+        font-size: clamp(1.5rem, 8vw, 2.5rem);
       }
     }
 
@@ -1419,7 +1088,6 @@
   <!-- Hero -->
   <section class="hero" id="hero">
     <div class="hero-bg">
-      <!-- CHANGE THIS SRC: Replace with your own hero image URL -->
       <img src="images/Hero.jpg" alt="Architecture" id="hero-img">
     </div>
     <div class="hero-content">
@@ -1454,14 +1122,11 @@
     </div>
   </section>
 
-  <!-- =========================================================
-       CONTACT SECTION — Form + JS-protected email
-       ========================================================= -->
+  <!-- Contact -->
   <section class="contact-section" id="contact">
     <div class="contact-grid">
       <div>
         <h2 class="section-title" style="margin-bottom:3rem;">Get in Touch</h2>
-        <!-- CHANGE THIS: Replace YOUR_FORM_ID with your actual Formspree form endpoint -->
         <form action="https://formspree.io/f/mwvggldr" method="POST" class="contact-form" id="contact-form">
           <div class="form-group">
             <label>Name</label>
@@ -1481,7 +1146,6 @@
       <div class="contact-alt">
         <h3>Prefer email?</h3>
         <p>You can also reach me directly. Click below to copy my address.</p>
-        <!-- This href is set by JavaScript — never contains the raw email in HTML -->
         <a href="#" id="email-link" class="contact-btn">Open Email App</a>
         <br style="display:block; margin-bottom:0.75rem;">
         <button class="copy-btn" onclick="copyEmail()" id="copy-btn">
@@ -1505,7 +1169,6 @@
     </div>
     <div class="footer-col">
       <h4>Social</h4>
-      <!-- CHANGE THESE # to your real profile URLs -->
       <a href="https://www.instagram.com/abdelrahman_yasser02" target="_blank" rel="noopener">Instagram</a>
       <a href="https://www.linkedin.com/in/amorsy12370" target="_blank" rel="noopener">LinkedIn</a>
       <a href="https://www.behance.net/abdel-yasser" target="_blank" rel="noopener">Behance</a>
@@ -1526,9 +1189,6 @@
   </div>
 
   <script>
-    // ============================
-    // PROJECT DATA — EDIT THIS ARRAY (or use admin.html to manage it)
-    // ============================
     const PROJECTS = [
       {
         "id": 1785759658406,
@@ -1556,7 +1216,7 @@
           "images/Project-2/12.jpg",
           "images/Project-2/13.jpg",
           "images/Project-2/14.jpg",
-          "images/Project-2/15.png",
+          "images/Project-2/15.png"
         ]
       },
       {
@@ -1606,7 +1266,7 @@
           "images/Project-3/06.jpg",
           "images/Project-3/07.jpg",
           "images/Project-3/08.png",
-          "images/Project-3/09.png",
+          "images/Project-3/09.png"
         ]
       },
       {
@@ -1634,9 +1294,6 @@
       }
     ];
 
-    // ============================
-    // INIT
-    // ============================
     gsap.registerPlugin(ScrollTrigger);
 
     const lenis = new Lenis({
@@ -1652,12 +1309,9 @@
     requestAnimationFrame(raf);
 
     lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {lenis.raf(time * 1000);});
+    gsap.ticker.add((time) => { lenis.raf(time * 1000); });
     gsap.ticker.lagSmoothing(0);
 
-    // ============================
-    // CUSTOM CURSOR
-    // ============================
     const cursor = document.getElementById('cursor');
     let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
 
@@ -1682,9 +1336,6 @@
       el.addEventListener('mouseleave', () => cursor.classList.remove('hover', 'view'));
     });
 
-    // ============================
-    // PRELOADER
-    // ============================
     const preloader = document.getElementById('preloader');
     const preloaderChars = preloader.querySelectorAll('span');
 
@@ -1708,9 +1359,6 @@
       }
     });
 
-    // ============================
-    // RENDER PROJECTS
-    // ============================
     const grid = document.getElementById('projects-grid');
     const countEl = document.getElementById('project-count');
 
@@ -1720,15 +1368,15 @@
       const card = document.createElement('div');
       card.className = 'project-card';
       card.innerHTML = `
-    <div class="project-image-wrap">
-      <div class="reveal-mask"></div>
-      <img src="${proj.cover}" alt="${proj.title}" loading="lazy">
-    </div>
-    <div class="project-info">
-      <h3 class="project-name">${proj.title}</h3>
-      <span class="project-meta">${proj.category} — ${proj.year}</span>
-    </div>
-  `;
+        <div class="project-image-wrap">
+          <div class="reveal-mask"></div>
+          <img src="${proj.cover}" alt="${proj.title}" loading="lazy">
+        </div>
+        <div class="project-info">
+          <h3 class="project-name">${proj.title}</h3>
+          <span class="project-meta">${proj.category} — ${proj.year}</span>
+        </div>
+      `;
       card.addEventListener('click', () => openModal(proj));
       grid.appendChild(card);
     });
@@ -1738,9 +1386,6 @@
       else img.onload = () => img.classList.add('loaded');
     });
 
-    // ============================
-    // ANIMATIONS
-    // ============================
     function initAnimations() {
       gsap.to('#hero-img', {
         yPercent: 30,
@@ -1755,16 +1400,16 @@
       });
 
       gsap.fromTo('.hero-title .line span',
-        {yPercent: 100, autoAlpha: 0},
-        {yPercent: 0, autoAlpha: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.2}
+        { yPercent: 100, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.2 }
       );
       gsap.fromTo('.hero-label span',
-        {yPercent: 100, autoAlpha: 0},
-        {yPercent: 0, autoAlpha: 1, duration: 1, ease: "power4.out"}
+        { yPercent: 100, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 1, ease: "power4.out" }
       );
       gsap.fromTo('.hero-meta span',
-        {yPercent: 100, autoAlpha: 0},
-        {yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.6}
+        { yPercent: 100, autoAlpha: 0 },
+        { yPercent: 0, autoAlpha: 1, duration: 1, stagger: 0.1, ease: "power4.out", delay: 0.6 }
       );
 
       const aboutText = document.getElementById('about-text');
@@ -1796,9 +1441,9 @@
           }
         });
 
-        tl.to(mask, {scaleX: 0, duration: 1.2, ease: "power4.inOut"})
-          .to(img, {scale: 1, duration: 1.4, ease: "power3.out"}, "-=0.8")
-          .from(info.children, {y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out"}, "-=0.6");
+        tl.to(mask, { scaleX: 0, duration: 1.2, ease: "power4.inOut" })
+          .to(img, { scale: 1, duration: 1.4, ease: "power3.out" }, "-=0.8")
+          .from(info.children, { y: 30, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power3.out" }, "-=0.6");
       });
 
       gsap.from('.section-header', {
@@ -1806,7 +1451,7 @@
         opacity: 0,
         duration: 1,
         ease: "power3.out",
-        scrollTrigger: {trigger: '.section-header', start: 'top 85%'}
+        scrollTrigger: { trigger: '.section-header', start: 'top 85%' }
       });
 
       gsap.from('.contact-grid > *', {
@@ -1815,7 +1460,7 @@
         duration: 1,
         stagger: 0.2,
         ease: "power3.out",
-        scrollTrigger: {trigger: '.contact-section', start: 'top 75%'}
+        scrollTrigger: { trigger: '.contact-section', start: 'top 75%' }
       });
 
       gsap.from('footer > *', {
@@ -1824,25 +1469,19 @@
         duration: 1,
         stagger: 0.15,
         ease: "power3.out",
-        scrollTrigger: {trigger: 'footer', start: 'top 85%'}
+        scrollTrigger: { trigger: 'footer', start: 'top 85%' }
       });
     }
 
-    // ============================
-    // NAV HIDE/SHOW
-    // ============================
     let lastScroll = 0;
     const navbar = document.getElementById('navbar');
 
-    lenis.on('scroll', ({scroll}) => {
+    lenis.on('scroll', ({ scroll }) => {
       if (scroll > lastScroll && scroll > 100) navbar.classList.add('hidden');
       else navbar.classList.remove('hidden');
       lastScroll = scroll;
     });
 
-    // ============================
-    // MODAL
-    // ============================
     const modal = document.getElementById('modal');
     const modalContent = document.getElementById('modal-content');
     const modalClose = document.getElementById('modal-close');
@@ -1857,33 +1496,31 @@
       const rest = images.slice(1);
 
       modalContent.innerHTML = `
-    <div class="modal-images">
-      <img src="${hero}" alt="${proj.title}" class="modal-hero">
-      <div class="modal-collage">
-        ${rest.map((img, i) => `<img src="${img}" alt="${proj.title} ${i + 2}" loading="lazy">`).join('')}
-      </div>
-    </div>
-    <div class="modal-info">
-      <span class="project-meta">${proj.category} / ${proj.year}</span>
-      <h2 class="modal-title">${proj.title}</h2>
-      <div class="modal-details">
-        <div class="modal-detail">
-          <h4>Location</h4>
-          <p>${proj.location}</p>
+        <div class="modal-images">
+          <img src="${hero}" alt="${proj.title}" class="modal-hero">
+          <div class="modal-collage">
+            ${rest.map((img, i) => `<img src="${img}" alt="${proj.title} ${i + 2}" loading="lazy">`).join('')}
+          </div>
         </div>
-        <div class="modal-detail">
-          <h4>Area</h4>
-          <p>${proj.area}</p>
+        <div class="modal-info">
+          <span class="project-meta">${proj.category} / ${proj.year}</span>
+          <h2 class="modal-title">${proj.title}</h2>
+          <div class="modal-details">
+            <div class="modal-detail">
+              <h4>Location</h4>
+              <p>${proj.location}</p>
+            </div>
+            <div class="modal-detail">
+              <h4>Area</h4>
+              <p>${proj.area}</p>
+            </div>
+          </div>
+          <p class="modal-desc">${proj.description}</p>
         </div>
-      </div>
-      <p class="modal-desc">${proj.description}</p>
-    </div>
-  `;
+      `;
 
-      // DIRECT LISTENERS: attach to each image immediately after DOM insertion
       modalContent.querySelectorAll('.modal-images img').forEach(img => {
         img.addEventListener('click', function () {
-          console.log('Image clicked:', this.src); // debug
           openLightbox(this.src, this.alt);
         });
       });
@@ -1892,8 +1529,12 @@
       document.body.style.overflow = 'hidden';
       lenis.stop();
 
-      modalWheelHandler = (e) => e.stopPropagation();
-      modalContent.addEventListener('wheel', modalWheelHandler, {passive: true});
+      // CRITICAL FIX: Only stop propagation on desktop where modal-content scrolls
+      // On mobile, .modal scrolls and needs the wheel event to bubble to it
+      if (window.innerWidth > 768) {
+        modalWheelHandler = (e) => e.stopPropagation();
+        modalContent.addEventListener('wheel', modalWheelHandler, { passive: true });
+      }
 
       gsap.from('.modal-hero', {
         y: 30, opacity: 0, duration: 0.7, ease: "power3.out",
@@ -1913,17 +1554,14 @@
       document.body.style.overflow = '';
       lenis.start();
       if (modalWheelHandler) {
-        modalContent.removeEventListener('wheel', modalWheelHandler, {passive: true});
+        modalContent.removeEventListener('wheel', modalWheelHandler, { passive: true });
         modalWheelHandler = null;
       }
     }
 
     modalClose.addEventListener('click', closeModal);
-    modal.addEventListener('click', (e) => {if (e.target === modal) closeModal();});
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
 
-    // ============================
-    // LIGHTBOX — Event Delegation (bulletproof)
-    // ============================
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightbox-img');
     const lightboxCaption = document.getElementById('lightbox-caption');
@@ -1948,9 +1586,6 @@
       if (e.target === lightbox) closeLightbox();
     });
 
-    // ============================
-    // KEYBOARD HANDLERS
-    // ============================
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
         if (lightbox.classList.contains('active')) closeLightbox();
@@ -1958,9 +1593,6 @@
       }
     });
 
-    // ============================
-    // SMOOTH SCROLL NAV
-    // ============================
     document.querySelectorAll('.nav-links a[href^="#"]').forEach(anchor => {
       anchor.addEventListener('click', (e) => {
         e.preventDefault();
@@ -1969,9 +1601,6 @@
       });
     });
 
-    // ============================
-    // PROTECTED EMAIL
-    // ============================
     const emailUser = "studio";
     const emailDomain = "gmail";
     const emailTld = "com";
@@ -1999,9 +1628,6 @@
       });
     }
 
-    // ============================
-    // CONTACT FORM
-    // ============================
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
       contactForm.addEventListener('submit', async (e) => {
@@ -2015,7 +1641,7 @@
           const res = await fetch(contactForm.action, {
             method: 'POST',
             body: new FormData(contactForm),
-            headers: {Accept: 'application/json'}
+            headers: { Accept: 'application/json' }
           });
           if (res.ok) {
             btn.textContent = 'Message Sent';
@@ -2026,13 +1652,10 @@
         } catch {
           btn.textContent = 'Error — Try Again';
         }
-        setTimeout(() => {btn.textContent = original; btn.disabled = false;}, 3000);
+        setTimeout(() => { btn.textContent = original; btn.disabled = false; }, 3000);
       });
     }
 
-    // ============================
-    // MOBILE MENU
-    // ============================
     const menuToggle = document.getElementById('menu-toggle');
     const navLinks = document.getElementById('nav-links');
 
@@ -2042,7 +1665,6 @@
         navLinks.classList.toggle('open');
       });
 
-      // Close menu when a link is clicked
       navLinks.querySelectorAll('a').forEach(link => {
         link.addEventListener('click', () => {
           menuToggle.classList.remove('active');
@@ -2051,18 +1673,12 @@
       });
     }
 
-    // ============================
-    // TOUCH DEVICE DETECTION
-    // ============================
     const isTouchDevice = window.matchMedia('(pointer: coarse)').matches;
-
     if (isTouchDevice) {
-      // Remove hover-dependent cursor states
       document.querySelectorAll('.project-card').forEach(card => {
         card.style.cursor = 'pointer';
       });
     }
   </script>
 </body>
-
 </html>
